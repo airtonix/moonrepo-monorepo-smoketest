@@ -5,4 +5,8 @@ describe("hello", () => {
   it("returns a greeting", () => {
     expect(hello("world")).toBe("hello, world")
   })
+
+  it("trims surrounding whitespace in names", () => {
+    expect(hello("  world  ")).toBe("hello, world")
+  })
 })
