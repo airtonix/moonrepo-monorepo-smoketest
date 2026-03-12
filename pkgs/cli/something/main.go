@@ -3,12 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 var version = "0.0.1"
 
 func greet(name string) string {
-	return fmt.Sprintf("hello, %s", name)
+	cleanName := strings.TrimSpace(name)
+	if cleanName == "" {
+		cleanName = "friend"
+	}
+	return fmt.Sprintf("hello, %s", cleanName)
 }
 
 func printHelp() {
