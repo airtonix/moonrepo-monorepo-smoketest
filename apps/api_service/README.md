@@ -40,6 +40,8 @@ Wrangler environments are defined for:
 
 Override routes at deploy time with `CF_WORKER_ROUTES` (comma-separated routes) or define static `routes` in `wrangler.toml` under `env.production`.
 
+Tip: for scripted publish flows, pass the target, tag, and environment positionally (for example `latest preview`) so CI logs show `arg1/arg2/arg3` values clearly.
+
 ## Auth strategy
 
 `publish` accepts either:
