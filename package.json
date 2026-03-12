@@ -1,0 +1,11 @@
+{
+  "name": "home-assistant-borg-backup",
+  "version": "0.0.1",
+  "dependencies": {
+    "@moonrepo/cli": "*"
+  },
+  "workspaces": [
+    "apps/*",
+    "pkgs/**/*"
+  ]
+}

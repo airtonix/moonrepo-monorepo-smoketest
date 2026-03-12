@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+      - release/*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      publish_matrix: ${{ steps.publish-matrix.outputs.publish_matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Toolchain
+        uses: moonrepo/setup-toolchain@8794f0318b9df4a43a5ddc23cefd16f595b423dd # v0
+        with:
+          auto-install: true
+          auto-setup: true
+
+      - name: PrepareReleasePleaseMode
+        id: mode
+        run: |
+          set -euo pipefail
+
+          mode="$(.github/tasks/get-release-mode "${GITHUB_REF_NAME}")"
+
+          case "${mode}" in
+            hotfix)
+              config_file="release-please-config--hotfix.json"
+              ;;
+            normal)
+              config_file="release-please-config--release.json"
+              ;;
+            *)
+              echo "Unsupported release mode: ${mode}" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "mode=${mode}" >> "${GITHUB_OUTPUT}"
+          echo "config_file=${config_file}" >> "${GITHUB_OUTPUT}"
+
+      - uses: google-github-actions/release-please-action@a017ec70c7f1401744d60197f7577a0c51c8c1cf # v4
+        id: release-please
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: ${{ steps.mode.outputs.config_file }}
+          manifest-file: .release-please-manifest.json
+          skip-github-pull-request: false
+
+      - id: publish-matrix
+        run: |
+          set -euo pipefail
+
+          release_payload='${{ toJson(steps.release-please.outputs) }}'
+          mode='${{ steps.mode.outputs.mode }}'
+          tag="next"
+          if [ '${{ steps.release-please.outputs.releases_created }}' = 'true' ]; then
+            tag="latest"
+          fi
+
+          publish_matrix="$(.github/tasks/get-released manifest "${release_payload}" "${mode}" "${tag}" | jq -rc '.')"
+          echo "publish_matrix=${publish_matrix}" >> "${GITHUB_OUTPUT}"
+
+  publish:
+    needs: process
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: needs.process.outputs.publish_matrix != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.process.outputs.publish_matrix) }}
+    steps:
+      - name: Dispatch publish
+        uses: peter-evans/repository-dispatch@bf47d102fdb849e755b0b0023ea3e81a44b6f570 # v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: publish-package
+          client-payload: '{"target":"${{ matrix.target }}","tag":"${{ matrix.tag }}","mode":"${{ matrix.mode }}","version":"${{ matrix.version }}"}'

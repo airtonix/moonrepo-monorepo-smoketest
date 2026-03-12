@@ -1,0 +1,169 @@
+# Contributing
+
+Thank you for your interest in contributing to this project! This guide explains how to set up your development environment, our contribution conventions, and the CI pipeline.
+
+## Prerequisites
+
+Before you start, ensure you have:
+
+- **mise** — polyglot runtime manager (install from [mise.jdx.dev](https://mise.jdx.dev))
+- **moon** — task orchestrator (managed by mise)
+- **proto** — toolchain manager (managed by mise)
+
+## Setup
+
+1. **Clone the repo and install tools:**
+   ```bash
+   git clone <repo-url>
+   cd <repo-name>
+   ```
+
+2. **Install global moon and proto via mise:**
+   ```bash
+   mise use -g --pin github:moonrepo/moon
+   mise use -g --pin github:moonrepo/proto
+   ```
+
+3. **Install project tools and setup:**
+   ```bash
+   proto install
+   hk install
+   moon run :setup
+   ```
+
+   This will:
+   - Install all pinned tool versions (from `.prototools` and `.proto/`)
+   - Set up git hooks via `hk` (linters, formatters)
+   - Run project-specific setup tasks
+
+4. **Verify everything works:**
+   ```bash
+   moon run :lint
+   moon run :test
+   moon run :build
+   ```
+
+## Development Conventions
+
+### Use Moon tasks, not npm scripts
+
+- **All project work** must go through `moon run` commands
+- This repo uses the `no-package-scripts` linter to enforce this in `pkgs/*` (libraries and CLI tools)
+- Apps in `apps/*` may proxy scripts through moon tasks for convenience
+- See `moon.yml` (project root) and per-project `moon.yml` files for available tasks
+
+**Example:**
+```bash
+# ✅ Correct
+moon run :lint
+moon run :test
+
+# ❌ Avoid
+npm run lint
+npm test
+```
+
+### Proto for tool pinning
+
+- All tool versions are declared in `.prototools` and managed by proto
+- Custom plugins are in `proto/plugins/` (e.g., `hk.toml` for git hooks)
+- Run `proto install` to fetch and cache tool versions
+
+### Git hooks via hk
+
+- Pre-commit hooks run linters and auto-fixers automatically before commit
+- Hooks are configured in `hk.pkl` with linters for ESLint, Prettier, Actionlint (GitHub workflows), Pkl, and custom rules
+- Run `hk check` to validate, `hk fix` to auto-fix issues
+
+## Commit and PR title conventions
+
+This project uses **conventional commit messages** and **semantic PR titles**.
+
+- PR title lint is enforced by `.github/workflows/pr-title.yml`.
+- Contributors are expected to keep commit messages in conventional format.
+
+Preferred format:
+
+```
+<type>(<scope>): <description>
+```
+
+Optional body/footer are allowed.
+
+**Allowed types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+
+**Examples:**
+- `chore(dashboard): smoke test docs update`
+- `fix(api-service): handle empty request payload`
+- `docs(repo): clarify release workflow behavior`
+
+## CI Pipeline
+
+The repository currently includes these workflows:
+- `.github/workflows/pr.yml`
+- `.github/workflows/release.yml`
+- `.github/workflows/publish.yml`
+- `.github/workflows/pr-title.yml`
+- `.github/workflows/stale.yml`
+
+### 1. **PR checks** (`.github/workflows/pr.yml`)
+
+Runs on pull requests:
+- sets up toolchain via `moonrepo/setup-toolchain`
+- validates `counter-lib` internal-only guardrails (`private: true`, no-op package/publish)
+- runs `moon run :lint`, `moon run :test`, and `moon run :build`
+
+**Must pass before merging.**
+
+### 2. **Release** (`.github/workflows/release.yml`)
+
+Runs on pushes to configured release branches (`master`, `release/*`):
+- checks release-config drift (`.github/tasks/get-release-configs check`)
+- resolves release mode (`normal` vs `hotfix`)
+- runs Release Please
+- computes publish matrix and dispatches `publish.yml` for released targets
+
+### 3. **Publish targets** (`.github/workflows/publish.yml`)
+
+Triggered by repository dispatch from release workflow, and manually via `workflow_dispatch`.
+- validates requested target against moon projects
+- runs `<target>:publish`
+- writes publish summary to `GITHUB_STEP_SUMMARY`
+- fails fast on unknown/empty targets
+
+Current state: several project `:publish` tasks are intentionally skeletal to validate CI flow without external deployment side effects.
+
+### 4. **PR title lint** (`.github/workflows/pr-title.yml`)
+
+Enforces semantic PR titles on pull requests.
+
+### 5. **Stale management** (`.github/workflows/stale.yml`)
+
+Automatically marks/closes stale issues and pull requests on schedule.
+
+## Review process
+
+1. Create a feature branch from the repository default branch
+2. Make your changes, commit with conventional commit messages
+3. Push and open a pull request
+4. Ensure PR title follows semantic format (e.g., `feat: add new feature`)
+5. Address any CI failures or review comments
+6. PR author owns follow-up until green: fix failing checks, respond to review feedback, and push updates as needed
+7. Once approved and CI passes, your PR will be merged to the repository default branch
+8. The release workflow then handles release PR/publish orchestration for configured release branches
+
+## Project structure
+
+- **`apps/`** — runnable applications
+- **`pkgs/`** — publishable and internal packages
+- **`.moon/`** — moon workspace configuration
+- **`.prototools`** — toolchain version pinning
+- **`proto/`** — custom proto plugins
+- **`.github/workflows/`** — CI/CD pipelines
+
+## Questions?
+
+If you have questions, feel free to:
+- Open an issue for bugs or feature requests
+- Check existing issues and discussions
+- Review the main `README.md` for project overview
