@@ -18,4 +18,4 @@ moon run docs-site:package
 
 ## GitHub Pages URL
 
-- Expected URL: `https://airtonix.github.io/moon-proto-monorepo-template/`
+- Expected URL: `https://airtonix.github.io/moonrepo-monorepo-smoketest/`
