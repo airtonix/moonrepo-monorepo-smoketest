@@ -4,6 +4,6 @@
   "apps/docs_site": "1.0.0",
   "pkgs/cli/something": "1.0.0",
   "pkgs/libs/counter": "1.0.0",
-  "pkgs/libs/hello": "1.0.0"
+  "pkgs/libs/hello": "1.1.0"
 }
 
