@@ -11,8 +11,8 @@ function toTitleCase(value: string): string {
 }
 
 export function hello(name: string, options: HelloOptions = {}): string {
-  const trimmed = name.trim()
-  const normalized = options.titleCase ? toTitleCase(trimmed) : trimmed
+  const collapsed = name.trim().replace(/\s+/g, " ")
+  const normalized = options.titleCase ? toTitleCase(collapsed) : collapsed
 
   return `hello, ${normalized}`
 }

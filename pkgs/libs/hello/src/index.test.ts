@@ -10,6 +10,10 @@ describe("hello", () => {
     expect(hello("  world  ")).toBe("hello, world")
   })
 
+  it("collapses repeated internal whitespace", () => {
+    expect(hello("hello    moonrepo")).toBe("hello, hello moonrepo")
+  })
+
   it("supports title-cased names", () => {
     expect(hello("  jANE doE  ", { titleCase: true })).toBe("hello, Jane Doe")
   })
