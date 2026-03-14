@@ -9,4 +9,8 @@ describe("hello", () => {
   it("trims surrounding whitespace in names", () => {
     expect(hello("  world  ")).toBe("hello, world")
   })
+
+  it("supports title-cased names", () => {
+    expect(hello("  jANE doE  ", { titleCase: true })).toBe("hello, Jane Doe")
+  })
 })
