@@ -10,6 +10,10 @@ describe("hello", () => {
     expect(hello("  world  ")).toBe("hello, world")
   })
 
+  it("collapses repeated internal whitespace", () => {
+    expect(hello("hello    moonrepo")).toBe("hello, hello moonrepo")
+  })
+
   it("supports optional punctuation", () => {
     expect(hello("world", { punctuation: "!" })).toBe("hello, world!")
   })
