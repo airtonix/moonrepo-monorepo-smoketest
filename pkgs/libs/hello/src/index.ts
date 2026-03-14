@@ -1,6 +1,7 @@
 export type HelloOptions = {
   punctuation?: "" | "!" | "?"
   titleCase?: boolean
+  shout?: boolean
 }
 
 function toTitleCase(value: string): string {
@@ -18,7 +19,8 @@ export function hello(name: string, options: HelloOptions = {}): string {
     return "hello, friend"
   }
 
-  const normalized = options.titleCase ? toTitleCase(collapsed) : collapsed
+  const cased = options.titleCase ? toTitleCase(collapsed) : collapsed
+  const normalized = options.shout ? cased.toUpperCase() : cased
   const suffix = options.punctuation ?? ""
 
   return `hello, ${normalized}${suffix}`
