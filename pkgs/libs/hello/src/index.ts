@@ -13,6 +13,11 @@ function toTitleCase(value: string): string {
 
 export function hello(name: string, options: HelloOptions = {}): string {
   const collapsed = name.trim().replace(/\s+/g, " ")
+
+  if (!collapsed) {
+    return "hello, friend"
+  }
+
   const normalized = options.titleCase ? toTitleCase(collapsed) : collapsed
   const suffix = options.punctuation ?? ""
 
