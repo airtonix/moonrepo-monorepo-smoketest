@@ -9,4 +9,8 @@ describe("hello", () => {
   it("trims surrounding whitespace in names", () => {
     expect(hello("  world  ")).toBe("hello, world")
   })
+
+  it("supports optional punctuation", () => {
+    expect(hello("world", { punctuation: "!" })).toBe("hello, world!")
+  })
 })
