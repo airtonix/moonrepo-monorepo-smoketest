@@ -1,5 +1,4 @@
 {
-  "./pkgs/libs/hello": "0.0.1",
   "apps/api_service": "1.0.0",
   "apps/dashboard": "1.0.0",
   "apps/docs_site": "1.0.0",
