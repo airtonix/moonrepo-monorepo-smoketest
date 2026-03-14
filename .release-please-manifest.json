@@ -1,5 +1,6 @@
 {
   "./pkgs/libs/hello": "0.0.1",
+  "pkgs/cli/something": "1.0.0",
   "pkgs/libs/hello": "1.0.0"
 }
 
