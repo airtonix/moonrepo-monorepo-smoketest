@@ -23,3 +23,7 @@ export function hello(name: string, options: HelloOptions = {}): string {
 
   return `hello, ${normalized}${suffix}`
 }
+
+export function helloMany(names: string[], options: HelloOptions = {}): string[] {
+  return names.map((name) => hello(name, options))
+}

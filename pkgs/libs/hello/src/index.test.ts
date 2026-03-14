@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { hello } from "./index"
+import { hello, helloMany } from "./index"
 
 describe("hello", () => {
   it("returns a greeting", () => {
@@ -30,5 +30,12 @@ describe("hello", () => {
 
   it("uses a fallback name when input is empty", () => {
     expect(hello("     ")).toBe("hello, friend")
+  })
+
+  it("greets many names", () => {
+    expect(helloMany(["world", "  jANE doE  "], { titleCase: true })).toEqual([
+      "hello, World",
+      "hello, Jane Doe",
+    ])
   })
 })
