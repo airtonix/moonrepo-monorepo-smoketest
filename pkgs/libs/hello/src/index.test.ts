@@ -14,7 +14,17 @@ describe("hello", () => {
     expect(hello("hello    moonrepo")).toBe("hello, hello moonrepo")
   })
 
+  it("supports title-cased names", () => {
+    expect(hello("  jANE doE  ", { titleCase: true })).toBe("hello, Jane Doe")
+  })
+
   it("supports optional punctuation", () => {
     expect(hello("world", { punctuation: "!" })).toBe("hello, world!")
+  })
+
+  it("supports punctuation and title case together", () => {
+    expect(hello("  jANE doE  ", { titleCase: true, punctuation: "?" })).toBe(
+      "hello, Jane Doe?",
+    )
   })
 })
