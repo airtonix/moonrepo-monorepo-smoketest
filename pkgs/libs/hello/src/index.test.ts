@@ -27,4 +27,8 @@ describe("hello", () => {
       "hello, Jane Doe?",
     )
   })
+
+  it("uses a fallback name when input is empty", () => {
+    expect(hello("     ")).toBe("hello, friend")
+  })
 })
